@@ -56,9 +56,9 @@ const Login = () => {
           <div className="flex items-center justify-center">
             <Github className="h-10 w-10" />
           </div>
-          <h1 className="mt-4 text-3xl font-bold">Welcome to Repo Chat</h1>
+          <h1 className="mt-4 text-3xl font-bold">Welcome to Code Chat</h1>
           <p className="mt-2 text-muted-foreground">
-            Sign in to start chatting with your repositories
+            Sign in to start chatting with your code repositories
           </p>
         </div>
         
