@@ -1,14 +1,21 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Github, FileArchive, Upload, ClipboardPaste } from 'lucide-react';
+import { Github, FileArchive, Upload, ClipboardPaste, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import Header from '@/components/Header';
-import RepoCard, { UploadCard } from '@/components/RepoCard';
+import { UploadCard } from '@/components/RepoCard';
 import Loading from '@/components/Loading';
 
 // Example data - in a real app, this would come from your API
@@ -38,16 +45,30 @@ const RepoSelection = () => {
   const [repoUrl, setRepoUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedRepo, setSelectedRepo] = useState<string>("");
   const navigate = useNavigate();
   const { toast } = useToast();
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-  const handleExistingRepoSelect = (id: string) => {
+  const handleExistingRepoSelect = (value: string) => {
+    setSelectedRepo(value);
+  };
+
+  const handleExistingRepoSubmit = () => {
+    if (!selectedRepo) {
+      toast({
+        title: "No repository selected",
+        description: "Please select a repository from the dropdown",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     setIsLoading(true);
     // Simulate loading repository
     setTimeout(() => {
       setIsLoading(false);
-      navigate(`/chat/${id}`);
+      navigate(`/chat/${selectedRepo}`);
     }, 2000);
   };
 
@@ -129,18 +150,39 @@ const RepoSelection = () => {
             <TabsTrigger value="upload">Upload ZIP</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="existing" className="space-y-4 animate-fade-in">
-            {SAMPLE_REPOS.map((repo, index) => (
-              <RepoCard
-                key={repo.id}
-                name={repo.name}
-                description={repo.description}
-                lastUpdated={repo.lastUpdated}
-                onClick={() => handleExistingRepoSelect(repo.id)}
-                className="animate-slide-up"
-                style={{ animationDelay: `${index * 100}ms` }}
-              />
-            ))}
+          <TabsContent value="existing" className="space-y-6 animate-fade-in">
+            <div className="glass-card rounded-xl p-6">
+              <h2 className="text-xl font-medium mb-4">Select an existing repository</h2>
+              
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="repo-select">Repository</Label>
+                  <Select value={selectedRepo} onValueChange={handleExistingRepoSelect}>
+                    <SelectTrigger className="w-full mt-1.5">
+                      <SelectValue placeholder="Select a repository" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {SAMPLE_REPOS.map((repo) => (
+                        <SelectItem key={repo.id} value={repo.id}>
+                          <div className="flex flex-col">
+                            <span>{repo.name}</span>
+                            <span className="text-xs text-muted-foreground">{repo.description}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <Button 
+                  onClick={handleExistingRepoSubmit} 
+                  className="w-full"
+                  disabled={!selectedRepo}
+                >
+                  Continue with Selected Repository
+                </Button>
+              </div>
+            </div>
           </TabsContent>
           
           <TabsContent value="github" className="animate-fade-in">
