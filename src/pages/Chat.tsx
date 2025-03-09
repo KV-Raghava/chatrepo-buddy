@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { MessageSquare, User, Bot } from 'lucide-react';
@@ -9,7 +8,6 @@ import ChatHistory, { ChatSession } from '@/components/ChatHistory';
 import MessageInput from '@/components/MessageInput';
 import { cn } from '@/lib/utils';
 
-// Example data - in a real app, this would come from your API
 const SAMPLE_CHAT_SESSIONS: ChatSession[] = [
   { 
     id: '1', 
@@ -48,9 +46,7 @@ const Chat = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  // Load initial messages - in a real app, fetch from API
   useEffect(() => {
-    // Simulate loading messages for the selected chat
     const initialMessages: Message[] = [
       {
         id: '1',
@@ -63,7 +59,6 @@ const Chat = () => {
     setMessages(initialMessages);
   }, [repoId]);
 
-  // Auto-scroll to bottom on new messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -71,7 +66,6 @@ const Chat = () => {
   const handleSendMessage = (content: string) => {
     if (!content.trim()) return;
     
-    // Add user message
     const userMessage: Message = {
       id: crypto.randomUUID(),
       content,
@@ -82,7 +76,6 @@ const Chat = () => {
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
     
-    // Simulate bot response after a delay
     setTimeout(() => {
       const botMessage: Message = {
         id: crypto.randomUUID(),
@@ -96,7 +89,6 @@ const Chat = () => {
     }, 1500);
   };
 
-  // Simple bot response generator - replace with actual AI in real app
   const generateBotResponse = (userMessage: string): string => {
     const responses = [
       "I've analyzed your repository and found that this pattern appears in several files. Would you like me to show some examples?",
@@ -110,7 +102,6 @@ const Chat = () => {
   };
 
   const handleSelectSession = (id: string) => {
-    // Update active session
     setSessions(prev => 
       prev.map(session => ({
         ...session,
@@ -118,7 +109,6 @@ const Chat = () => {
       }))
     );
     
-    // In a real app, fetch messages for the selected session
     toast({
       title: "Chat session changed",
       description: `Switched to "${sessions.find(s => s.id === id)?.title}"`,
@@ -126,7 +116,6 @@ const Chat = () => {
   };
 
   const handleNewChat = () => {
-    // Create a new chat session
     const newSession: ChatSession = {
       id: crypto.randomUUID(),
       title: "New Conversation",
@@ -134,7 +123,6 @@ const Chat = () => {
       isActive: true
     };
     
-    // Update sessions list
     setSessions(prev => 
       [newSession, ...prev.map(session => ({
         ...session,
@@ -142,7 +130,6 @@ const Chat = () => {
       }))]
     );
     
-    // Clear messages for new chat
     setMessages([{
       id: crypto.randomUUID(),
       content: 'Hello! I\'m your repository assistant. How can I help you with your code today?',
@@ -152,7 +139,6 @@ const Chat = () => {
   };
 
   const handleDeleteSession = (id: string) => {
-    // Remove session
     setSessions(prev => prev.filter(session => session.id !== id));
     
     toast({
@@ -167,10 +153,9 @@ const Chat = () => {
 
   return (
     <div className="h-screen flex flex-col">
-      <Header title="Repository Chat" showBackButton showSettings />
+      <Header title="Code Chat" showBackButton showSettings />
       
       <div className="flex flex-1 overflow-hidden">
-        {/* Chat history sidebar - hidden on mobile until toggled */}
         <div 
           className={cn(
             "w-80 flex-shrink-0 bg-sidebar transition-all duration-300 md:translate-x-0",
@@ -186,9 +171,7 @@ const Chat = () => {
           />
         </div>
         
-        {/* Chat area */}
         <div className="flex-1 flex flex-col min-w-0">
-          {/* Mobile toggle for sidebar */}
           <div className="md:hidden p-2 border-b border-border">
             <button
               onClick={() => setIsMobileViewOpen(!isMobileViewOpen)}
@@ -198,7 +181,6 @@ const Chat = () => {
             </button>
           </div>
           
-          {/* Messages */}
           <ScrollArea className="flex-1 p-4">
             <div className="max-w-3xl mx-auto space-y-6">
               {messages.map((message) => (
@@ -265,7 +247,6 @@ const Chat = () => {
             </div>
           </ScrollArea>
           
-          {/* Message input */}
           <div className="p-4 border-t border-border">
             <div className="max-w-3xl mx-auto">
               <MessageInput 
