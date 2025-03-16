@@ -48,101 +48,122 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4">
-      <div 
-        className="w-full max-w-md space-y-8 animate-fade-in"
-      >
-        <div className="text-center">
-          <div className="flex items-center justify-center">
-            <Github className="h-10 w-10" />
+    <div className="min-h-screen flex">
+      {/* Left side - Code image */}
+      <div className="hidden md:block md:w-1/2 bg-primary/5 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent"></div>
+        <div className="absolute inset-0 flex items-center justify-center p-12">
+          <div className="max-w-md">
+            <img 
+              src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6" 
+              alt="Code visualization" 
+              className="rounded-xl shadow-lg object-cover w-full"
+            />
+            <div className="mt-8 text-left">
+              <h2 className="text-2xl font-bold text-foreground">Chat with your codebase</h2>
+              <p className="mt-2 text-muted-foreground">
+                Navigate, understand, and improve your code through natural conversations with an AI that understands your repositories.
+              </p>
+            </div>
           </div>
-          <h1 className="mt-4 text-3xl font-bold">Welcome to Code Chat</h1>
-          <p className="mt-2 text-muted-foreground">
-            Sign in to start chatting with your code repositories
+        </div>
+      </div>
+      
+      {/* Right side - Login form */}
+      <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-8 md:p-12">
+        <div className="w-full max-w-md space-y-8 animate-fade-in">
+          <div className="text-center">
+            <div className="flex items-center justify-center">
+              <Github className="h-10 w-10" />
+            </div>
+            <h1 className="mt-4 text-3xl font-bold">Welcome to Code Chat</h1>
+            <p className="mt-2 text-muted-foreground">
+              Sign in to start chatting with your code repositories
+            </p>
+          </div>
+          
+          <div className="mt-8 glass-card rounded-xl p-8 shadow-subtle">
+            <form className="space-y-6" onSubmit={handleLogin}>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    className="pl-10"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Password</Label>
+                  <a 
+                    href="#" 
+                    className="text-sm text-primary hover:text-primary/80 transition-colors"
+                  >
+                    Forgot password?
+                  </a>
+                </div>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
+                    className="pl-10"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+              
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={isLoading}
+              >
+                {isLoading ? 'Signing in...' : 'Sign in'}
+              </Button>
+            </form>
+            
+            <div className="mt-6">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-border"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-card text-muted-foreground">
+                    Or continue with
+                  </span>
+                </div>
+              </div>
+              
+              <Button 
+                variant="outline" 
+                className="mt-4 w-full flex items-center justify-center gap-2"
+                onClick={handleGithubLogin}
+                disabled={isLoading}
+              >
+                <Github className="h-4 w-4" />
+                GitHub
+              </Button>
+            </div>
+          </div>
+          
+          <p className="text-center text-sm text-muted-foreground mt-6">
+            Don't have an account?{' '}
+            <a href="#" className="text-primary hover:text-primary/80 transition-colors">
+              Sign up
+            </a>
           </p>
         </div>
-        
-        <div className="mt-8 glass-card rounded-xl p-8">
-          <form className="space-y-6" onSubmit={handleLogin}>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  className="pl-10"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                <a 
-                  href="#" 
-                  className="text-sm text-primary hover:text-primary/80 transition-colors"
-                >
-                  Forgot password?
-                </a>
-              </div>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  className="pl-10"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
-            
-            <Button 
-              type="submit" 
-              className="w-full" 
-              disabled={isLoading}
-            >
-              {isLoading ? 'Signing in...' : 'Sign in'}
-            </Button>
-          </form>
-          
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-border"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-card text-muted-foreground">
-                  Or continue with
-                </span>
-              </div>
-            </div>
-            
-            <Button 
-              variant="outline" 
-              className="mt-4 w-full flex items-center justify-center gap-2"
-              onClick={handleGithubLogin}
-              disabled={isLoading}
-            >
-              <Github className="h-4 w-4" />
-              GitHub
-            </Button>
-          </div>
-        </div>
-        
-        <p className="text-center text-sm text-muted-foreground mt-6">
-          Don't have an account?{' '}
-          <a href="#" className="text-primary hover:text-primary/80 transition-colors">
-            Sign up
-          </a>
-        </p>
       </div>
     </div>
   );
