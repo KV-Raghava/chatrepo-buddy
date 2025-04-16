@@ -1,63 +1,31 @@
-import React, { useState, useEffect, useRef } from 'react';
+
+import React, { useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { MessageSquare, User, Bot } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from "@/hooks/use-toast";
 import Header from '@/components/Header';
-import ChatHistory, { ChatSession } from '@/components/ChatHistory';
+import ChatHistory from '@/components/ChatHistory';
 import MessageInput from '@/components/MessageInput';
 import { cn } from '@/lib/utils';
-
-const SAMPLE_CHAT_SESSIONS: ChatSession[] = [
-  { 
-    id: '1', 
-    title: 'React App Structure',
-    lastMessage: 'Can you explain the component hierarchy?',
-    timestamp: '10:23 AM', 
-    isActive: true
-  },
-  { 
-    id: '2', 
-    title: 'API Integration Issues',
-    lastMessage: 'How do I fix the authentication flow?',
-    timestamp: 'Yesterday', 
-  },
-  { 
-    id: '3', 
-    title: 'Performance Optimization',
-    lastMessage: 'The app is slow when loading large datasets',
-    timestamp: 'Sep 15', 
-  },
-];
-
-interface Message {
-  id: string;
-  content: string;
-  sender: 'user' | 'bot';
-  timestamp: Date;
-}
+import { useChat } from '@/hooks/useChat';
 
 const Chat = () => {
   const { repoId } = useParams<{ repoId: string }>();
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [sessions, setSessions] = useState<ChatSession[]>(SAMPLE_CHAT_SESSIONS);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isMobileViewOpen, setIsMobileViewOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
-
-  useEffect(() => {
-    const initialMessages: Message[] = [
-      {
-        id: '1',
-        content: 'Hello! I\'m your repository assistant. How can I help you with your code today?',
-        sender: 'bot',
-        timestamp: new Date(Date.now() - 1000 * 60 * 5) // 5 minutes ago
-      }
-    ];
-    
-    setMessages(initialMessages);
-  }, [repoId]);
+  const [isMobileViewOpen, setIsMobileViewOpen] = React.useState(false);
+  
+  const {
+    messages,
+    sessions,
+    isLoadingMessages,
+    isSendingMessage,
+    sendMessage,
+    selectSession,
+    createNewSession,
+    deleteSession
+  } = useChat({ initialSessionId: repoId });
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -65,49 +33,11 @@ const Chat = () => {
 
   const handleSendMessage = (content: string) => {
     if (!content.trim()) return;
-    
-    const userMessage: Message = {
-      id: crypto.randomUUID(),
-      content,
-      sender: 'user',
-      timestamp: new Date()
-    };
-    
-    setMessages(prev => [...prev, userMessage]);
-    setIsLoading(true);
-    
-    setTimeout(() => {
-      const botMessage: Message = {
-        id: crypto.randomUUID(),
-        content: generateBotResponse(content),
-        sender: 'bot',
-        timestamp: new Date()
-      };
-      
-      setMessages(prev => [...prev, botMessage]);
-      setIsLoading(false);
-    }, 1500);
-  };
-
-  const generateBotResponse = (userMessage: string): string => {
-    const responses = [
-      "I've analyzed your repository and found that this pattern appears in several files. Would you like me to show some examples?",
-      "Based on your codebase, I'd recommend refactoring this section to improve performance.",
-      "Looking at your repository structure, I notice you're using an older version of this library. There's a newer approach available.",
-      "Your question touches on several parts of the codebase. The main implementation is in the core module, but it interfaces with these other components.",
-      "I can see that this functionality was recently changed. Here's how it works now compared to the previous implementation."
-    ];
-    
-    return responses[Math.floor(Math.random() * responses.length)];
+    sendMessage(content);
   };
 
   const handleSelectSession = (id: string) => {
-    setSessions(prev => 
-      prev.map(session => ({
-        ...session,
-        isActive: session.id === id
-      }))
-    );
+    selectSession(id);
     
     toast({
       title: "Chat session changed",
@@ -115,36 +45,21 @@ const Chat = () => {
     });
   };
 
-  const handleNewChat = () => {
-    const newSession: ChatSession = {
-      id: crypto.randomUUID(),
-      title: "New Conversation",
-      timestamp: "Just now",
-      isActive: true
-    };
+  const handleNewChat = async () => {
+    if (!repoId) {
+      toast({
+        title: "Error",
+        description: "Repository ID is missing",
+        variant: "destructive"
+      });
+      return;
+    }
     
-    setSessions(prev => 
-      [newSession, ...prev.map(session => ({
-        ...session,
-        isActive: false
-      }))]
-    );
-    
-    setMessages([{
-      id: crypto.randomUUID(),
-      content: 'Hello! I\'m your repository assistant. How can I help you with your code today?',
-      sender: 'bot',
-      timestamp: new Date()
-    }]);
+    await createNewSession(repoId);
   };
 
   const handleDeleteSession = (id: string) => {
-    setSessions(prev => prev.filter(session => session.id !== id));
-    
-    toast({
-      title: "Chat deleted",
-      description: "The conversation has been removed",
-    });
+    deleteSession(id);
   };
 
   const formatMessageDate = (date: Date): string => {
@@ -183,6 +98,14 @@ const Chat = () => {
           
           <ScrollArea className="flex-1 p-4">
             <div className="max-w-3xl mx-auto space-y-6">
+              {messages.length === 0 && !isLoadingMessages && (
+                <div className="text-center py-10 text-muted-foreground">
+                  <Bot className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p className="text-lg">Start a conversation about your code</p>
+                  <p className="text-sm mt-2">Ask questions about your repository, get code explanations, or request assistance.</p>
+                </div>
+              )}
+              
               {messages.map((message) => (
                 <div 
                   key={message.id}
@@ -228,7 +151,7 @@ const Chat = () => {
                 </div>
               ))}
               
-              {isLoading && (
+              {(isLoadingMessages || isSendingMessage) && (
                 <div className="flex items-start space-x-4">
                   <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center flex-shrink-0">
                     <Bot className="h-5 w-5" />
@@ -251,7 +174,7 @@ const Chat = () => {
             <div className="max-w-3xl mx-auto">
               <MessageInput 
                 onSendMessage={handleSendMessage}
-                isLoading={isLoading}
+                isLoading={isSendingMessage}
               />
             </div>
           </div>
