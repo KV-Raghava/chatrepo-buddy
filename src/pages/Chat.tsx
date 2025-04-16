@@ -68,7 +68,7 @@ const Chat = () => {
 
   return (
     <div className="h-screen flex flex-col">
-      <Header title="Code Chat" showBackButton showSettings />
+      <Header title="Code Buddy" showBackButton showSettings />
       
       <div className="flex flex-1 overflow-hidden">
         <div 
@@ -185,3 +185,4 @@ const Chat = () => {
 };
 
 export default Chat;
+

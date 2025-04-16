@@ -34,7 +34,7 @@ const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center">
           <Github className="h-6 w-6 mr-2" />
           <h1 className="text-xl font-medium">
-            {title || 'Code Chat'}
+            {title || 'Code Buddy'}
           </h1>
         </div>
       </div>
@@ -54,3 +54,4 @@ const Header: React.FC<HeaderProps> = ({
 };
 
 export default Header;
+

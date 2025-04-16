@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Github, Lock, User } from 'lucide-react';
@@ -62,7 +61,7 @@ const Login = () => {
             <div className="mt-8 text-left">
               <h2 className="text-2xl font-bold text-foreground">Chat with your codebase</h2>
               <p className="mt-2 text-muted-foreground">
-                Navigate, understand, and improve your code through natural conversations with an AI that understands your repositories.
+                Navigate, understand, and improve your code through natural conversations with Code Buddy.
               </p>
             </div>
           </div>
@@ -76,7 +75,7 @@ const Login = () => {
             <div className="flex items-center justify-center">
               <Github className="h-10 w-10" />
             </div>
-            <h1 className="mt-4 text-3xl font-bold">Welcome to Code Chat</h1>
+            <h1 className="mt-4 text-3xl font-bold">Welcome to Code Buddy</h1>
             <p className="mt-2 text-muted-foreground">
               Sign in to start chatting with your code repositories
             </p>
