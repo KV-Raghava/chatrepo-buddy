@@ -43,6 +43,8 @@ const SAMPLE_REPOS = [
 const RepoSelection = () => {
   const [activeTab, setActiveTab] = useState('existing');
   const [repoUrl, setRepoUrl] = useState('');
+  const [repoName, setRepoName] = useState('');
+  const [uploadRepoName, setUploadRepoName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedRepo, setSelectedRepo] = useState<string>("");
@@ -83,6 +85,15 @@ const RepoSelection = () => {
       });
       return;
     }
+
+    if (!repoName.trim()) {
+      toast({
+        title: "Name required",
+        description: "Please enter a name for your repository",
+        variant: "destructive"
+      });
+      return;
+    }
     
     setIsLoading(true);
     // Simulate loading repository
@@ -101,6 +112,15 @@ const RepoSelection = () => {
       });
       return;
     }
+
+    if (!uploadRepoName.trim()) {
+      toast({
+        title: "Name required",
+        description: "Please enter a name for your repository",
+        variant: "destructive"
+      });
+      return;
+    }
     
     setIsLoading(true);
     // Simulate uploading and processing
@@ -113,6 +133,10 @@ const RepoSelection = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setSelectedFile(e.target.files[0]);
+      // Auto-populate the name from the file name, removing .zip extension
+      const fileName = e.target.files[0].name;
+      const nameWithoutExtension = fileName.replace(/\.zip$/, '');
+      setUploadRepoName(nameWithoutExtension);
     }
   };
 
@@ -121,6 +145,10 @@ const RepoSelection = () => {
     
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       setSelectedFile(e.dataTransfer.files[0]);
+      // Auto-populate the name from the file name, removing .zip extension
+      const fileName = e.dataTransfer.files[0].name;
+      const nameWithoutExtension = fileName.replace(/\.zip$/, '');
+      setUploadRepoName(nameWithoutExtension);
     }
   };
 
@@ -196,21 +224,34 @@ const RepoSelection = () => {
               </p>
               
               <form onSubmit={handleGithubRepoSubmit}>
-                <div className="mb-6">
-                  <Label htmlFor="repo-url">Repository URL</Label>
-                  <div className="mt-1.5 relative">
-                    <ClipboardPaste className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="repo-url">Repository URL</Label>
+                    <div className="mt-1.5 relative">
+                      <ClipboardPaste className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="repo-url"
+                        placeholder="https://github.com/username/repository"
+                        className="pl-10"
+                        value={repoUrl}
+                        onChange={(e) => setRepoUrl(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="repo-name">Repository Name</Label>
                     <Input
-                      id="repo-url"
-                      placeholder="https://github.com/username/repository"
-                      className="pl-10"
-                      value={repoUrl}
-                      onChange={(e) => setRepoUrl(e.target.value)}
+                      id="repo-name"
+                      placeholder="Enter a name for this repository"
+                      value={repoName}
+                      onChange={(e) => setRepoName(e.target.value)}
+                      className="mt-1.5"
                     />
                   </div>
                 </div>
                 
-                <Button type="submit" className="w-full">
+                <Button type="submit" className="w-full mt-6">
                   Connect Repository
                 </Button>
               </form>
@@ -261,11 +302,22 @@ const RepoSelection = () => {
                   </div>
                 )}
               </div>
+
+              <div className="mb-6">
+                <Label htmlFor="upload-repo-name">Repository Name</Label>
+                <Input
+                  id="upload-repo-name"
+                  placeholder="Enter a name for this repository"
+                  value={uploadRepoName}
+                  onChange={(e) => setUploadRepoName(e.target.value)}
+                  className="mt-1.5"
+                />
+              </div>
               
               <Button 
                 onClick={handleFileUpload} 
                 className="w-full"
-                disabled={!selectedFile}
+                disabled={!selectedFile || !uploadRepoName.trim()}
               >
                 Upload and Process
               </Button>
